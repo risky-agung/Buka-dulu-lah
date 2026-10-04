@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untuk lu 🫵</title>
+    <!-- Library Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0d1117;
+            color: #e6edf3;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Canvas Kembang Api */
+        #fireworksCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            display: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            text-align: center;
+            z-index: 10;
+            position: relative;
+        }
+
+        .overlay-header {
+            font-size: 0.85rem;
+            color: #8b949e;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        h1 {
+            color: #58a6ff;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        /* Lilin Ulang Tahun */
+        .cake-container {
+            margin: 15px auto;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .cake {
+            position: relative;
+            width: 90px;
+            height: 50px;
+            background: #ec4899;
+            border-radius: 10px 10px 0 0;
+            margin: 0 auto;
+            box-shadow: inset 0 8px 0 #be185d;
+        }
+
+        .candle {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 20px;
+            background: repeating-linear-gradient(45deg, #fff, #fff 4px, #10b981 4px, #10b981 8px);
+            border-radius: 2px;
+        }
+
+        .flame {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 14px;
+            background: #f97316;
+            border-radius: 50% 50% 20% 20%;
+            box-shadow: 0 0 10px #f97316;
+            animation: flicker 0.6s infinite alternate;
+        }
+
+        .flame.off { display: none; }
+
+        @keyframes flicker {
+            0% { transform: translateX(-50%) scale(1); }
+            100% { transform: translateX(-50%) scale(1.15); }
+        }
+
+        /* Section Box */
+        .box-section {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .game-title {
+            font-weight: bold;
+            color: #79c0ff;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        /* Game Kartu */
+        .card-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .card {
+            width: 65px;
+            height: 90px;
+            background: #1f6feb;
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+            user-select: none;
+        }
+
+        .card.flipped {
+            background: #8957e5;
+            transform: rotateY(180deg);
+        }
+
+        /* Input Form */
+        input[type="number"] {
+            padding: 10px;
+            width: 110px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            color: #fff;
+            border-radius: 8px;
+            text-align: center;
+            outline: none;
+        }
+
+        button.btn-main {
+            padding: 10px 18px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 8px;
+            transition: background 0.3s;
+        }
+
+        button.btn-main:hover { background: #2ea043; }
+
+        /* Slide Foto */
+        .slider-box {
+            display: none;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #30363d;
+        }
+
+        .slider-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        /* Message Cards (Muncul Bertahap) */
+        .message-card {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 15px;
+            text-align: left;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #c9d1d9;
+            display: none;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        .message-card.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="fireworksCanvas"></canvas>
+    <audio id="birthdaySong" src="birthday.mp3" loop></audio>
+
+    <div class="container">
+        <!-- Overlay Header & Title -->
+        <p class="overlay-header" id="overlayText">HAPPY BIRTHDAY</p>
+        <h1>Untuk lu 🫵</h1>
+
+        <!-- Lilin Interaktif -->
+        <div class="cake-container" id="cakeBtn">
+            <div class="cake">
+                <div class="candle">
+                    <div class="flame" id="flame"></div>
+                </div>
+            </div>
+            <p style="font-size: 0.75rem; color: #8b949e; margin-top: 6px;">(Klik kue untuk tiup lilin! 🕯️)</p>
+        </div>
+
+        <!-- Slider Foto Kenangan -->
+        <div class="slider-box" id="sliderBox">
+            <img id="slideImage" class="slider-img" src="https://picsum.photos/600/300?random=1" alt="Foto">
+        </div>
+
+        <!-- Game Tebak Kartu (Diubah Angkanya: 12, 13, 14, 15) -->
+        <div class="box-section" id="cardGameBox">
+            <p class="game-title">🃏 Game Tebak Kartu Umurmu</p>
+            <div class="card-container">
+                <div class="card" data-angka="12">?</div>
+                <div class="card" data-angka="13">?</div>
+                <div class="card" data-angka="14">?</div>
+                <div class="card" data-angka="15">?</div>
+            </div>
+            <p id="game-hint" style="font-size: 0.85rem; color: #d2a8ff; min-height: 18px;"></p>
+        </div>
+
+        <!-- Hitung Umur -->
+        <div class="box-section" id="inputUmurBox">
+            <p class="game-title">📅 Masukkan Tahun Lahirmu</p>
+            <div>
+                <input type="number" id="tahunLahir" placeholder="Ex: 2011">
+                <button class="btn-main" id="btnHitung">Cek Umur!</button>
+            </div>
+        </div>
+
+        <!-- SURAT UCAPAN (UPDATE DARI SCREENSHOT TERBARU) -->
+        <!-- 1. Pesan Container Awal -->
+        <div class="message-card" id="card1">
+            <p style="color: #79c0ff; font-weight: bold; font-size: 1.05rem;">Happy birthday bro! 🎉</p>
+        </div>
+
+        <!-- 2. Pesan Container Utama -->
+        <div class="message-card" id="card2">
+            <p>Ciyee yang hari ini ultah 🥳... Dah tambah tua aja kau jadinya. Semoga kau sehat selalu yaa... Btw streak TikTok kita jangan sampe mati yaa.</p>
+        </div>
+
+        <!-- 3. Pesan Penutup -->
+        <div class="message-card" id="card3">
+            <p>Oh yaa, semangat terus jalanin harinya yaaa, jangan putus asa buat ngejar impianlu 👏 dan semoga impianmu bisa terwujud satu per satu.</p>
+        </div>
+
+        <!-- 4. Pesan Akhir -->
+        <div class="message-card" id="card4">
+            <p style="color: #ff7b72; font-weight: bold;">Sekali lagi, Happy birthday bro! 🎉</p>
+            <p style="margin-top: 8px; color: #d2a8ff; font-weight: bold; font-size: 1rem;">Kau lah kawan online terbaikku.</p>
+        </div>
+
+        <!-- Tombol Lanjut -->
+        <button class="btn-main" id="btnNext" style="display:none; width:100%; margin:15px 0 0 0; padding:12px;" onclick="nextMessage()">Buka Pesan Selanjutnya ✨</button>
+    </div>
+
+    <script>
+        // @ts-nocheck
+        let angkaUlangTahunTerpilih = null;
+        let currentStep = 0;
+
+        // Tiup Lilin
+        document.getElementById('cakeBtn').addEventListener('click', function() {
+            const flame = document.getElementById('flame');
+            if(!flame.classList.contains('off')) {
+                flame.classList.add('off');
+                triggerConfetti();
+                alert("Hooray! Lilin berhasil ditiup! Semoga keinginanmu terwujud! 🥳🎉");
+            }
+        });
+
+        // Game Kartu
+        function flipCard(element, angka) {
+            document.querySelectorAll('.card').forEach(c => {
+                c.classList.remove('flipped');
+                c.innerText = '?';
+            });
+
+            element.classList.add('flipped');
+            element.innerText = String(angka);
+            angkaUlangTahunTerpilih = angka;
+            document.getElementById('game-hint').innerText = `Kamu memilih kartu angka: ${angka}!`;
+        }
+
+        // Hitung Umur
+        function hitungUmur() {
+            const tahunLahirInput = document.getElementById('tahunLahir').value;
+            if (!tahunLahirInput) {
+                alert("Masukkan tahun lahirmu dulu!");
+                return;
+            }
+
+            const tahunSekarang = 2026;
+            const umurAsli = tahunSekarang - parseInt(tahunLahirInput, 10);
+
+            if(umurAsli < 0 || parseInt(tahunLahirInput, 10) < 1900) {
+                alert("Tahun lahir tidak valid!");
+                return;
+            }
+
+            const song = document.getElementById('birthdaySong');
+            if(song) song.play().catch(() => console.log("Audio diblokir browser"));
+
+            // Efek
+            startFireworks();
+            createBalloons();
+            triggerConfetti();
+            startSlider();
+
+            document.getElementById('cardGameBox').style.display = "none";
+            document.getElementById('inputUmurBox').style.display = "none";
+            document.getElementById('btnNext').style.display = "block";
+
+            nextMessage();
+        }
+
+        // Navigasi Pesan
+        function nextMessage() {
+            currentStep++;
+            if(currentStep <= 4) {
+                document.getElementById(`card${currentStep}`).classList.add('active');
+                triggerConfetti();
+                if(currentStep === 4) {
+                    document.getElementById('btnNext').innerText = "Selesai ❤️";
+                    document.getElementById('overlayText').innerText = "Kau lah kawan online terbaikku";
+                }
+            }
+        }
+
+        // Slider Foto
+        const images = [
+            "https://picsum.photos/600/300?random=1",
+            "https://picsum.photos/600/300?random=2",
+            "https://picsum.photos/600/300?random=3"
+        ];
+        let imgIdx = 0;
+        function startSlider() {
+            document.getElementById('sliderBox').style.display = 'block';
+            setInterval(() => {
+                imgIdx = (imgIdx + 1) % images.length;
+                document.getElementById('slideImage').src = images[imgIdx];
+            }, 3000);
+        }
+
+        // Event Listener Init
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.card').forEach(card => {
+                card.addEventListener('click', function() {
+                    flipCard(this, parseInt(this.getAttribute('data-angka') || '0', 10));
+                });
+            });
+            document.getElementById('btnHitung').addEventListener('click', hitungUmur);
+        });
+
+        // Confetti & Fireworks
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+            }
+        }
+
+        function createBalloons() {
+            const colors = ['#ff4081', '#00e676', '#00b0ff', '#ffea00', '#d500f9'];
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const b = document.createElement('div');
+                    b.style.cssText = `position:fixed;bottom:-100px;left:${Math.random()*90}%;width:40px;height:55px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:50%;z-index:2;animation:flyUp 6s linear infinite;`;
+                    document.body.appendChild(b);
+                    setTimeout(() => b.remove(), 6000);
+                }, i * 300);
+            }
+        }
+
+        function startFireworks() {
+            const canvas = document.getElementById('fireworksCanvas');
+            if(!canvas) return;
+            canvas.style.display = "block";
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            class Particle {
+                constructor(x, y, color) {
+                    this.x = x; this.y = y; this.color = color;
+                    this.radius = Math.random() * 2 + 1;
+                    this.velocity = { x: (Math.random() - 0.5) * 4, y: (Math.random() - 0.5) * 4 };
+                    this.alpha = 1;
+                }
+                draw() {
+                    ctx.save(); ctx.globalAlpha = this.alpha; ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                    ctx.fillStyle = this.color; ctx.fill(); ctx.restore();
+                }
+                update() {
+                    this.velocity.y += 0.02; this.x += this.velocity.x; this.y += this.velocity.y;
+                    this.alpha -= 0.008;
+                }
+            }
+
+            setInterval(() => {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * (canvas.height * 0.5);
+                const colors = ['#ff1744', '#00e676', '#2979ff', '#ffea00', '#d500f9'];
+                for (let i = 0; i < 25; i++) {
+                    particles.push(new Particle(x, y, colors[Math.floor(Math.random() * colors.length)]));
+                }
+            }, 1800);
+
+            function animate() {
+                requestAnimationFrame(animate);
+                ctx.fillStyle = 'rgba(13, 17, 23, 0.2)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                particles.forEach((p, index) => {
+                    if (p.alpha > 0) { p.update(); p.draw(); }
+                    else { particles.splice(index, 1); }
+                });
+            }
+            animate();
+        }
+    </script>
+</body>
+</html>
